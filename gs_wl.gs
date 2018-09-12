@@ -1,6 +1,6 @@
 var GS_WL = {
   name : "Google Script _ Web Library",
-  version : "1.0.0",
+  version : "0.0.1",
 
   include :  function (filename) {
     return HtmlService.createTemplateFromFile(filename).evaluate().getContent();
