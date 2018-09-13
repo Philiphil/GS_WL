@@ -1,9 +1,13 @@
-var GS_WL = {
+var GSWL = {
   name : "Google Script _ Web Library",
   version : "0.0.2",
   routes : [],
   favicon : "",
   title : "",
+  MODE : {
+    DISPLAY:0,
+    COMPUTE :1,
+  },
 
   display : function(filename){
    return HtmlService.createTemplateFromFile(filename).evaluate()
@@ -23,8 +27,8 @@ var GS_WL = {
 
   init :  function (e,title,favicon) {
    this.setRequest(e)
-   this.title = title == "" ? "Google Script _ Web Library" : title
-   this.favicon = favicon == "" ? "Google Script _ Web Library" : favicon
+   this.title = title == null ? "Google Script _ Web Library" : title
+   this.favicon = favicon == null ? "" : favicon
   },  
 
   getRequest : function(){
@@ -47,11 +51,12 @@ var GS_WL = {
     cache.put("GS_WL_request", JSON.stringify(e) );
   },
 
-  setRoute : function(route,file,title,favicon){
-    file = file == null ? route : file
-    title = title == null ? this.title : title
-    favicon = favicon == null ? this.favicon : favicon
-    this.routes[route] = [file,title,favicon]
+  setRoute : function(route){
+
+    route.title = route.title == null ? this.title : route.title
+    route.favicon = route.favicon == null ? this.favicon : route.favicon
+
+    this.routes[route.route] = route
   },
 
   getRoute : function(route){
@@ -66,9 +71,25 @@ var GS_WL = {
     var route = this.getRoute(this.getPage())
     if( route.length == 0){
       route = this.getRoute("index")
-      if(route.length ==0) return ContentService.createTextOutput("GS WL INDEX").setMimeType(ContentService.MimeType.TEXT);
+      if(route == null) return ContentService.createTextOutput("GS WL INDEX").setMimeType(ContentService.MimeType.TEXT);
     }
-    if(route[2] == "")  return  this.display(route[0]).setTitle(route[1]);
-    return  this.display(route[0]).setTitle(route[1]).setFaviconUrl(route[2]);
+    switch(route.mode){
+      case GSWL.MODE.DISPLAY:
+        if(route.favicon == "")  return  this.display(route.file).setTitle(route.title);
+        return  this.display(route.file).setTitle(route.title).setFaviconUrl(route.favicon);
+      case GSWL.MODE.COMPUTE:
+         return this.display(route.file)
+    }
+
   },
+
+}
+
+function GSWL_route(route, title,  mode, file, favicon){
+  this.route = route
+  this.mode = mode == null ? GSWL.MODE.DISPLAY : mode
+  this.title = title 
+  this.file = file == null ? route : file
+  this.favicon = favicon 
+  return this
 }
