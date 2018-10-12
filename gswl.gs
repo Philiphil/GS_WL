@@ -66,6 +66,10 @@ var GSWL = {
   getUrl : function(route){
     return  ScriptApp.getService().getUrl() + "?page="+route
   },
+  
+  defaultValue : function(e,v){
+    return e == undefined ?v:e;
+  }
 
   executeRoute : function(){
     var route = this.getRoute(this.getPage())
